@@ -92,9 +92,14 @@ def generate_valuer(tree: ET.ElementTree) -> OrderedDict:
             "full",
         ))
 
-        full_score += group_score[group_id]
+        curr_group_score = group_score[group_id]
+
+        if each_test[group_id]:
+            curr_group_score *= max_test[group_id] - min_test[group_id] + 1
+
+        full_score += curr_group_score
         if feedback[group_id] != "hidden":
-            full_user_score += group_score[group_id]
+            full_user_score += curr_group_score
 
         group_score_list = []
         if each_test[group_id]:

@@ -51,7 +51,6 @@ def import_statement(location: str, language: str) -> ET.Element:
     notes = ''
     if 'notes.tex' in statement_files:
         notes += latex_to_html(location, 'notes.tex')
-    print(notes)
     if 'scoring.tex' in statement_files:
         notes += SCORING_TEXT[language].format(latex_to_html(location, 'scoring.tex'))
     if len(notes) > 0:

@@ -19,7 +19,7 @@ def latex_to_html(location: str, file_name: str) -> str:
     return open(os.path.join(location, "out.html")).read()
 
 
-def import_statement(location: str, language: str) -> ET.Element:
+def import_statement(location: str, language: str):
     statement_files = os.listdir(location)
     statement_files.sort()
 
@@ -38,25 +38,30 @@ def import_statement(location: str, language: str) -> ET.Element:
                 ET.SubElement(current_example, 'input').text = content
 
     legend = ''
+    res = [tree]
     if 'legend.tex' in statement_files:
         legend += latex_to_html(location, 'legend.tex')
     if 'interaction.tex' in statement_files:
         legend += INTERACTION_TEXT[language].format(latex_to_html(location, 'interaction.tex'))
     if len(legend) > 0:
-        ET.SubElement(statement, 'description').text = legend
+        res.append(legend)
+        ET.SubElement(statement, 'description').text = '{}'
     if 'input.tex' in statement_files:
-        ET.SubElement(statement, 'input_format').text = latex_to_html(location, 'input.tex')
+        ET.SubElement(statement, 'input_format').text = '{}'
+        res.append(latex_to_html(location, 'input.tex'))
     if 'output.tex' in statement_files:
-        ET.SubElement(statement, 'output_format').text = latex_to_html(location, 'output.tex')
+        ET.SubElement(statement, 'output_format').text = '{}'
+        res.append(latex_to_html(location, 'output.tex'))
     notes = ''
     if 'notes.tex' in statement_files:
         notes += latex_to_html(location, 'notes.tex')
     if 'scoring.tex' in statement_files:
         notes += SCORING_TEXT[language].format(latex_to_html(location, 'scoring.tex'))
     if len(notes) > 0:
-        ET.SubElement(statement, 'notes').text = notes
+        res.append(notes)
+        ET.SubElement(statement, 'notes').text = '{}'
     # TODO: media
-    return tree
+    return res
 
 
 def process_statement_xml(statement):

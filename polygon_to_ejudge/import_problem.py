@@ -8,7 +8,7 @@ from polygon_cli import problem
 from polygon_cli import config as cli_config
 
 from .common import Config, get_ejudge_contest_dir, UnquotedStr
-from .config import PROBLEM_CFG_START, GVALUER_LOCATION, CREATE_STATEMENTS
+from .config import PROBLEM_CFG_START, GVALUER_LOCATION, CREATE_STATEMENTS, IMPORT_ALL_SOLUTIONS
 from .gvaluer import generate_valuer
 from .statement import import_statement, process_statement_xml
 
@@ -92,6 +92,12 @@ def import_problem(
             extract_zip(zip_file, 'solutions/')
             solution_name = move_file_name(solution_name)
 
+            if not IMPORT_ALL_SOLUTIONS:
+                shutil.rmtree(os.path.join(problem_dir, 'solutions/'))
+
+            if tree.find('documents'):
+                extract_zip(zip_file, 'documents/')
+
             extract_zip(zip_file, 'files/')
             checker_name = move_file_name(tree.find('assets').find('checker').find('source').attrib['path'])
 
@@ -109,25 +115,31 @@ def import_problem(
 
                 problem_xml = ET.Element('problem')
 
+                format_statements = []
                 for language in statement_languages:
                     statement_xml = None
                     if language == 'russian':
-                        statement_xml = import_statement(
+                        import_statement_res = import_statement(
                             os.path.join(problem_dir, 'statement-sections', 'russian'),
                             'ru_RU',
                         )
+                        format_statements.extend(import_statement_res[1:])
+                        statement_xml = import_statement_res[0]
                     if language == 'english':
-                        statement_xml = import_statement(
+                        import_statement_res = import_statement(
                             os.path.join(problem_dir, 'statement-sections', 'english'),
                             'en_EN',
                         )
+                        format_statements.extend(import_statement_res[1:])
+                        statement_xml = import_statement_res[0]
                     if statement_xml:
                         example = problem_xml.find('examples')
                         if not example:
                             problem_xml.insert(0, statement_xml.find('examples'))
                         problem_xml.insert(0, statement_xml.find('statement'))
                 problem_xml_str = ET.tostring(problem_xml, encoding='utf-8', method='xml').decode('utf-8')
-                problem_xml_str = process_statement_xml(problem_xml_str)
+                problem_xml_str = problem_xml_str.format(*format_statements)
+                # problem_xml_str = process_statement_xml(problem_xml_str)
                 problem_xml_file = open('statements.xml', 'w')
                 problem_xml_file.write(problem_xml_str)
                 problem_xml_file.close()
@@ -210,6 +222,16 @@ def import_problem(
         config['solution_cmd'] = solution_name
 
         config['enable_testlib_mode'] = True
+
+        try:
+            problem_description = open('documents/description.txt', 'r')
+            for line in problem_description.readlines():
+                if line.startswith('source_header'):
+                    config['source_header'] = os.path.join(problem_dir, line.split()[1])
+                if line.startswith('source_footer'):
+                    config['source_footer'] = os.path.join(problem_dir, line.split()[1])
+        except:
+            pass
 
         problem_test = tree.find('judging').find('testset').find('tests').find('test')
         if problem_test is not None and 'points' in problem_test.keys():

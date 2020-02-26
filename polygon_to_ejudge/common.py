@@ -102,9 +102,9 @@ class Config:
         raise Exception("Unknown value type")
 
     @staticmethod
-    def print_config(configs: OrderedDict, fout) -> None:
+    def print_config(configs: OrderedDict, fout, beginning="") -> None:
         for key, value in configs.items():
-            print(Config.print_prepare(key, value), file=fout)
+            print(beginning, Config.print_prepare(key, value), file=fout, sep='')
         print(file=fout)
 
     def write(self):

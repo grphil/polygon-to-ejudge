@@ -4,17 +4,19 @@ import xml.etree.ElementTree as ET
 from .config import GVALUER_GLOBAL_PART, GVALUER_GROUP_BEGIN, GVALUER_TESTS, GVALUER_SCORE, GVALUER_REQUIRES, \
     GVALUER_SET_MARKED, GVALUER_OFFLINE, GVALUER_GROUP_END, FEEDBACK_POLICY
 
+from .common import Config
 
-def get_group_desc(group_id, l, r, score, requires, test_score, sets_marked):
+
+def get_group_desc(group_id, l, r, score, requires, test_score, sets_marked, offline):
     res = []
     res.append(GVALUER_GROUP_BEGIN.format(group_id))
     res.append(GVALUER_TESTS.format(l, r))
     res.append(GVALUER_SCORE.format(test_score, score))
     if len(requires) > 0:
         res.append(GVALUER_REQUIRES.format(', '.join(map(str, requires))))
-    if sets_marked:
-        res.append(GVALUER_SET_MARKED)
-    else:
+    if sets_marked != "":
+        res.append(GVALUER_SET_MARKED.format(sets_marked))
+    if offline:
         res.append(GVALUER_OFFLINE)
     res.append(GVALUER_GROUP_END)
     return '\n'.join(res)
@@ -60,25 +62,33 @@ def generate_valuer(tree: ET.ElementTree) -> OrderedDict:
         group_score[test_group[test_id]] = max(group_score[test_group[test_id]], test_points[test_id])
 
     valuer = open('valuer.cfg', 'w')
-    valuer.write(GVALUER_GLOBAL_PART)
+    print(GVALUER_GLOBAL_PART, file=valuer)
     full_score = 0
     full_user_score = 0
     open_tests = []
     final_open_tests = []
     test_score_list = []
+    online_groups = []
+    for group_id in range(groups):
+        if feedback[group_id] != "hidden":
+            online_groups.append(str(group_id))
     for group_id in range(groups):
         group_points = ''
         if each_test[group_id]:
             group_points = 'test_'
-        valuer.write(get_group_desc(
+        sets_marked = ''
+        if feedback[group_id] != "hidden" and str(group_id) == online_groups[-1]:
+            sets_marked = ', '.join(online_groups)
+        print(get_group_desc(
             group_id,
             min_test[group_id],
             max_test[group_id],
             group_score[group_id],
             group_dependencies[group_id],
             group_points,
-            feedback[group_id] != "hidden",
-        ))
+            sets_marked,
+            feedback[group_id] == "hidden",
+        ), file=valuer)
 
         open_tests.append('{}-{}:{}'.format(
             min_test[group_id],
@@ -111,8 +121,6 @@ def generate_valuer(tree: ET.ElementTree) -> OrderedDict:
             group_score_list.append(str(group_score[group_id]))
         test_score_list.append(' '.join(group_score_list))
 
-    valuer.close()
-
     config = OrderedDict()
     config['full_score'] = full_score
     config['full_user_score'] = full_user_score
@@ -124,4 +132,9 @@ def generate_valuer(tree: ET.ElementTree) -> OrderedDict:
     config['valuer_sets_marked'] = True
     config['olympiad_mode'] = True
     config['run_penalty'] = 0
+
+    Config.print_config(config, valuer, '# ')
+
+    valuer.close()
+
     return config

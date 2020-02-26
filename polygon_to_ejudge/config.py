@@ -25,16 +25,15 @@ GVALUER_GLOBAL_PART = '''global {
     stat_to_judges 1;
     stat_to_users 0;
 }
-
 '''
 
 GVALUER_GROUP_BEGIN = 'group {} {{'
 GVALUER_TESTS = '    tests {}-{};'
 GVALUER_SCORE = '    {}score {};'
 GVALUER_REQUIRES = '    requires {};'
-GVALUER_SET_MARKED = '    sets_marked;'
+GVALUER_SET_MARKED = '    sets_marked_if_passed {};'
 GVALUER_OFFLINE = '    offline;'
-GVALUER_GROUP_END = '}\n\n'
+GVALUER_GROUP_END = '}\n'
 
 
 FEEDBACK_POLICY = {

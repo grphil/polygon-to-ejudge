@@ -39,5 +39,6 @@ GVALUER_GROUP_END = '}\n'
 FEEDBACK_POLICY = {
     'none': 'hidden',
     'points': 'brief',
-    'complete': 'full'
+    'icpc': 'brief',
+    'complete': 'full',
 }

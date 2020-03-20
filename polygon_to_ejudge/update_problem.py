@@ -16,7 +16,7 @@ def update_problem(
     polygon_id = None
 
     for problem in config.problems:
-        if problem["id"] == ejudge_problem_id:
+        if 'id' in problem and problem["id"] == ejudge_problem_id:
             if "extid" in problem:
                 polygon_id = problem["extid"]
                 polygon_id = int(polygon_id[polygon_id.find(":") + 1:])

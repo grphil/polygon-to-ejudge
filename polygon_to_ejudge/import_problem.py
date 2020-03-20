@@ -49,7 +49,7 @@ def import_problem(
     if not ejudge_problem_id:
         ejudge_problem_id = 1
         for cfg_problem in contest_config.problems:
-            if "abstract" in cfg_problem and cfg_problem["abstract"]:
+            if "id" not in cfg_problem:
                 continue
             ejudge_problem_id = max(ejudge_problem_id, cfg_problem["id"] + 1)
 
@@ -253,7 +253,7 @@ def import_problem(
 
         problem_exists = False
         for problem_cfg in contest_config.problems:
-            if problem_cfg['id'] == ejudge_problem_id:
+            if 'id' in problem_cfg and problem_cfg['id'] == ejudge_problem_id:
                 problem_exists = True
                 problem_cfg.update(config)
 

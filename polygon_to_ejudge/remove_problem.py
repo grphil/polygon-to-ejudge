@@ -14,7 +14,7 @@ def remove_problem(
     internal_name = None
     config = Config(ejudge_contest_id)
     for i in range(len(config.problems)):
-        if config.problems[i]['id'] == ejudge_problem_id:
+        if 'id' in config.problems[i] and config.problems[i]['id'] == ejudge_problem_id:
             internal_name = config.problems[i]['internal_name']
             if not keep_config:
                 config.problems.pop(i)

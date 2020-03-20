@@ -109,7 +109,10 @@ class Config:
 
     def write(self):
         def get_id(configs: OrderedDict) -> int:
-            return configs['id']
+            if 'id' in configs:
+                return configs['id']
+            else:
+                return -1
 
         fout = open(self.serve_cfg_path, 'w')
         for line in self.begin_comments:

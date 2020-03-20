@@ -42,3 +42,57 @@ FEEDBACK_POLICY = {
     'icpc': 'brief',
     'complete': 'full',
 }
+
+INFORMATICS = '''<div class="problem-statement">
+{}
+</div>
+'''
+
+INFORMATICS_LEGEND = '''<div class="legend">
+  {}
+</div>
+'''
+
+INFORMATICS_INPUT = '''<div class="input-specification">
+  <div class="section-title">
+    Входные данные
+  </div>
+
+  {}
+</div>
+'''
+
+INFORMATICS_OUTPUT = '''<div class="output-specification">
+  <div class="section-title">
+     Входные данные
+  </div>
+
+  {}
+</div>
+'''
+
+INFORMATICS_NOTES = '''<div class="note">
+  <div class="section-title">
+    Примечание
+  </div>
+
+  {}
+</div>
+'''
+
+INFORMATICS_SCORING = '''<div class="scoring">
+  <div class="section-title">
+    Система оценки
+  </div>
+
+  {}
+</div>
+'''
+
+INFORMATICS_INTERACTION = '''<div class="interaction">
+  <div class="section-title">
+    Протокол взаимодействия</div>
+  </div>
+  {}
+</div>
+'''

@@ -1,7 +1,7 @@
 import os
 import xml.etree.ElementTree as ET
 
-from .config import RUN_PANDOC, INTERACTION_TEXT, SCORING_TEXT
+from .config import *
 
 
 def latex_to_html(location: str, file_name: str) -> str:
@@ -38,28 +38,50 @@ def import_statement(location: str, language: str):
                 ET.SubElement(current_example, 'input').text = content
 
     legend = ''
-    res = [tree]
+    informatics_statement = ''
+    res = [tree, informatics_statement]
     if 'legend.tex' in statement_files:
-        legend += latex_to_html(location, 'legend.tex')
+        text = latex_to_html(location, 'legend.tex')
+        legend += text
+        informatics_statement += INFORMATICS_LEGEND.format(text)
+
+    if 'input.tex' in statement_files:
+        ET.SubElement(statement, 'input_format').text = '{}'
+        text = latex_to_html(location, 'input.tex')
+        res.append(text)
+        informatics_statement += INFORMATICS_INPUT.format(text)
+
+    if 'output.tex' in statement_files:
+        ET.SubElement(statement, 'output_format').text = '{}'
+        text = latex_to_html(location, 'output.tex')
+        res.append(text)
+        informatics_statement += INFORMATICS_OUTPUT.format(text)
+
     if 'interaction.tex' in statement_files:
-        legend += INTERACTION_TEXT[language].format(latex_to_html(location, 'interaction.tex'))
+        text = latex_to_html(location, 'interaction.tex')
+        legend += INTERACTION_TEXT[language].format(text)
+        informatics_statement += INFORMATICS_INTERACTION.format(text)
+
     if len(legend) > 0:
         res.append(legend)
         ET.SubElement(statement, 'description').text = '{}'
-    if 'input.tex' in statement_files:
-        ET.SubElement(statement, 'input_format').text = '{}'
-        res.append(latex_to_html(location, 'input.tex'))
-    if 'output.tex' in statement_files:
-        ET.SubElement(statement, 'output_format').text = '{}'
-        res.append(latex_to_html(location, 'output.tex'))
+
     notes = ''
     if 'notes.tex' in statement_files:
-        notes += latex_to_html(location, 'notes.tex')
+        text = latex_to_html(location, 'notes.tex')
+        notes += text
+        informatics_statement += INFORMATICS_NOTES.format(text)
+
     if 'scoring.tex' in statement_files:
-        notes += SCORING_TEXT[language].format(latex_to_html(location, 'scoring.tex'))
+        text = latex_to_html(location, 'scoring.tex')
+        notes += SCORING_TEXT[language].format(text)
+        informatics_statement += INFORMATICS_SCORING.format(text)
     if len(notes) > 0:
         res.append(notes)
         ET.SubElement(statement, 'notes').text = '{}'
+
+    informatics_statement = INFORMATICS.format(informatics_statement)
+    res[1] = informatics_statement
     # TODO: media
     return res
 

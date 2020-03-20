@@ -22,34 +22,52 @@ def get_group_desc(group_id, l, r, score, requires, test_score, sets_marked, off
     return '\n'.join(res)
 
 
-def generate_valuer(tree: ET.ElementTree) -> OrderedDict:
+def generate_valuer(tree: ET.ElementTree, has_groups=True) -> OrderedDict:
     test_points = []
     test_group = []
 
+    group_name = dict()
+
     for test in tree.find('judging').find('testset').find('tests'):
         test_data = test.attrib
-        test_points.append(int(float(test_data['points'])))
-        test_group.append(int(test_data['group']))
+        if 'group' not in test_data:
+            has_groups = False
+        if has_groups:
+            test_points.append(int(float(test_data['points'])))
+            if test_data['group'] not in group_name:
+                c = len(group_name)
+                group_name[test_data['group']] = c
+            test_group.append(group_name[test_data['group']])
+        else:
+            test_points.append(0)
+
+    if not has_groups:
+        group_name = {None: 0}
+        test_group = [0] * len(test_points)
+        test_points = [0] * len(test_group)
+        test_points[-1] = 100
 
     tests = len(test_points)
-    groups = max(test_group) + 1
+    groups = len(group_name)
     group_dependencies = [[] for i in range(groups)]
     each_test = [False] * groups
-    feedback = [""] * groups
+    feedback = ["brief"] * groups
 
-    for group in tree.find('judging').find('testset').find('groups'):
-        group_id = int(group.attrib['name'])
-        dependencies = group.find('dependencies')
-        points_policy = group.attrib['points-policy']
-        feedback_policy = group.attrib['feedback-policy']
+    if has_groups:
+        for group in tree.find('judging').find('testset').find('groups'):
+            group_id = group_name[group.attrib['name']]
+            dependencies = group.find('dependencies')
+            points_policy = group.attrib['points-policy']
+            feedback_policy = group.attrib['feedback-policy']
 
-        if dependencies is not None:
-            for dep in dependencies:
-                dep_id = int(dep.attrib['group'])
-                group_dependencies[group_id].append(dep_id)
-        if points_policy == "each-test":
-            each_test[group_id] = True
-        feedback[group_id] = FEEDBACK_POLICY[feedback_policy]
+            if dependencies is not None:
+                for dep in dependencies:
+                    dep_id = group_name[dep.attrib['group']]
+                    group_dependencies[group_id].append(dep_id)
+            group_dependencies[group_id].sort()
+            if points_policy == "each-test":
+                each_test[group_id] = True
+            feedback[group_id] = FEEDBACK_POLICY[feedback_policy]
 
     min_test = [None] * groups
     max_test = [None] * groups

@@ -35,7 +35,7 @@ def import_problem(
         polygon_id: int,
         ejudge_problem_id=None,
 ) -> None:
-    session = problem.ProblemSession(cli_config.polygon_url, polygon_id)
+    session = problem.ProblemSession(cli_config.polygon_url, polygon_id, None)
     contest_dir = get_ejudge_contest_dir(ejudge_contest_id)
     download_dir = os.path.join(contest_dir, 'download')
     tmp_dir = os.path.join(contest_dir, 'tmp')
@@ -116,6 +116,7 @@ def import_problem(
                 problem_xml = ET.Element('problem')
 
                 format_statements = []
+                informatics_statements = None
                 for language in statement_languages:
                     statement_xml = None
                     if language == 'russian':
@@ -123,20 +124,27 @@ def import_problem(
                             os.path.join(problem_dir, 'statement-sections', 'russian'),
                             'ru_RU',
                         )
-                        format_statements.extend(import_statement_res[1:])
+                        format_statements.extend(import_statement_res[2:])
+                        informatics_statements = import_statement_res[1]
                         statement_xml = import_statement_res[0]
                     if language == 'english':
                         import_statement_res = import_statement(
                             os.path.join(problem_dir, 'statement-sections', 'english'),
                             'en_EN',
                         )
-                        format_statements.extend(import_statement_res[1:])
+                        format_statements.extend(import_statement_res[2:])
+                        if informatics_statements is None:
+                            informatics_statements = import_statement_res[1]
                         statement_xml = import_statement_res[0]
                     if statement_xml:
                         example = problem_xml.find('examples')
                         if not example:
                             problem_xml.insert(0, statement_xml.find('examples'))
                         problem_xml.insert(0, statement_xml.find('statement'))
+                if informatics_statements is not None:
+                    informatics_statements_file = open("statements.html", "w")
+                    informatics_statements_file.write(informatics_statements)
+                    informatics_statements_file.close()
                 problem_xml_str = ET.tostring(problem_xml, encoding='utf-8', method='xml').decode('utf-8')
                 problem_xml_str = problem_xml_str.format(*format_statements)
                 # problem_xml_str = process_statement_xml(problem_xml_str)
@@ -234,8 +242,8 @@ def import_problem(
             pass
 
         problem_test = tree.find('judging').find('testset').find('tests').find('test')
-        if problem_test is not None and 'points' in problem_test.keys():
-            valuer_config = generate_valuer(tree)
+        if problem_test is not None:
+            valuer_config = generate_valuer(tree, 'points' in problem_test.keys())
             if contest_config.common['score_system'].val != 'acm':
                 config.update(valuer_config)
                 contest_config.common['separate_user_score'] = 1

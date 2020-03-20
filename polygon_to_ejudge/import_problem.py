@@ -49,6 +49,8 @@ def import_problem(
     if not ejudge_problem_id:
         ejudge_problem_id = 1
         for cfg_problem in contest_config.problems:
+            if "abstract" in cfg_problem and cfg_problem["abstract"]:
+                continue
             ejudge_problem_id = max(ejudge_problem_id, cfg_problem["id"] + 1)
 
     ejudge_problem_id = int(ejudge_problem_id)
@@ -279,7 +281,7 @@ def import_contest(
         ejudge_id: int,
         polygon_id: int,
 ) -> None:
-    session = problem.ProblemSession(cli_config.polygon_url, None)
+    session = problem.ProblemSession(cli_config.polygon_url, None, None)
     problems = session.send_api_request('contest.problems', {'contestId': polygon_id}, problem_data=False)
     problem_keys = list(problems.keys())
     problem_keys.sort()

@@ -30,7 +30,11 @@ def remove_contest(
     contest_dir = get_ejudge_contest_dir(contest_id)
     shutil.rmtree(os.path.join(contest_dir, "problems"))
     config = Config(contest_id)
-    config.problems.clear()
+    abstract_problems = []
+    for problem in config.problems:
+        if "abstract" in problem:
+            abstract_problems.append(problem.copy())
+    config.problems = abstract_problems
     config.write()
 
 

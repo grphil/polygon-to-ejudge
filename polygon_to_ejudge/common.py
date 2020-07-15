@@ -21,7 +21,6 @@ class Config:
         self.languages = []
         self.problems = []
         self.testers = []
-        self.begin_comments = []
         self.end_comments = []
         self.contest_id = contest_id
 
@@ -29,30 +28,30 @@ class Config:
         self.serve_cfg_path = os.path.join(contest_dir, "conf", "serve.cfg")
 
         serve_cfg = open(self.serve_cfg_path, "r")
-        config_started = False
         section_name = 'global'
         section_configs = OrderedDict()
+        comments = []
 
         for line in serve_cfg.readlines():
             line = line.strip()
             if line.startswith('#'):
-                if config_started:
-                    if section_name:
-                        self.add_config(section_name, section_configs)
-                    section_name = ''
-                    section_configs.clear()
-                    self.end_comments.append(line)
-                else:
-                    self.begin_comments.append(line)
+                comments.append(line)
                 continue
-            config_started = True
+
             if len(line) == 0:
                 continue
+
+            if len(comments) > 0:
+                for comment in comments:
+                    section_configs[comment] = True
+                comments = []
+
             if line.startswith('[') and line.endswith(']'):
                 self.add_config(section_name, section_configs)
                 section_configs.clear()
                 section_name = line[1:-1]
                 continue
+
             if '=' in line:
                 key = line[:line.find('=')].strip()
                 value = line[line.find('=') + 1:].strip()
@@ -68,6 +67,10 @@ class Config:
                 section_configs[line] = True
         if section_name:
             self.add_config(section_name, section_configs)
+
+        if len(comments) > 0:
+            self.end_comments = comments.copy()
+
         serve_cfg.close()
 
     def add_config(
@@ -115,9 +118,6 @@ class Config:
                 return -1
 
         fout = open(self.serve_cfg_path, 'w')
-        for line in self.begin_comments:
-            print(line, file=fout)
-        print(file=fout)
         self.print_config(self.common, fout)
 
         self.languages.sort(key=get_id)

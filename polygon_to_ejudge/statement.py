@@ -16,7 +16,9 @@ def latex_to_html(location: str, file_name: str) -> str:
         os.path.join(location, file_name),
         os.path.join(location, "out.html"),
     ))
-    return open(os.path.join(location, "out.html")).read()
+    result = open(os.path.join(location, "out.html")).read()
+    result = result.replace('[0cm]', '')
+    return result
 
 
 def import_statement(location: str, language: str):
@@ -82,7 +84,6 @@ def import_statement(location: str, language: str):
 
     informatics_statement = INFORMATICS.format(informatics_statement)
     res[1] = informatics_statement
-    # TODO: media
     return res
 
 

@@ -3,12 +3,15 @@ import os
 import shutil
 import xml.etree.ElementTree as ET
 import zipfile
+import random
+from bs4 import BeautifulSoup
 
 from polygon_cli import problem
 from polygon_cli import config as cli_config
 
 from .common import Config, get_ejudge_contest_dir, UnquotedStr
-from .config import PROBLEM_CFG_START, GVALUER_LOCATION, CREATE_STATEMENTS, IMPORT_ALL_SOLUTIONS
+from .config import PROBLEM_CFG_START, GVALUER_LOCATION, CREATE_STATEMENTS, IMPORT_ALL_SOLUTIONS, CONVERT_EPS, \
+    IMG_STYLE, IMG_SRC_PREFIX
 from .gvaluer import generate_valuer
 from .statement import import_statement, process_statement_xml
 
@@ -28,6 +31,32 @@ def move_file_name(file_name):
     shutil.copyfile(os.path.join(prefix, file_name), file_name)
     file_name = file_name[:file_name.rfind('.')]
     return file_name
+
+
+def extract_images(statements, src_dir, out_dir):
+    print(statements)
+    st = BeautifulSoup(statements, "xml")
+    print(st)
+    images = st.find_all("img")
+    for img in images:
+        shutil.copyfile(os.path.join(src_dir, img['src']), os.path.join(out_dir, img['src']))
+        img['src'] = IMG_SRC_PREFIX + img['src']
+        img['style'] = IMG_STYLE
+
+    epses = st.find_all("embed")
+    for eps_img in epses:
+        name = ''.join([random.choice([str(i) for i in range(10)]) for i in range(10)]) + ".png"
+        os.system(CONVERT_EPS.format(
+            os.path.join(out_dir, name),
+            os.path.join(src_dir, eps_img['src'])
+        ))
+        img = BeautifulSoup("<img>", features="html.parser")
+        img.find('img')['src'] = IMG_SRC_PREFIX + name
+        img.find('img')['style'] = IMG_STYLE
+        print(img)
+        eps_img.replace_with(img)
+        print(st)
+    return str(st)
 
 
 def import_problem(
@@ -149,6 +178,15 @@ def import_problem(
                     informatics_statements_file.close()
                 problem_xml_str = ET.tostring(problem_xml, encoding='utf-8', method='xml').decode('utf-8')
                 problem_xml_str = problem_xml_str.format(*format_statements)
+
+                if len(statement_languages) > 0:
+                    attachments_dir = os.path.join(problem_dir, 'attachments')
+                    os.mkdir(attachments_dir)
+                    problem_xml_str = extract_images(
+                        problem_xml_str,
+                        os.path.join(problem_dir, 'statement-sections', statement_languages[0]),
+                        attachments_dir
+                    )
                 # problem_xml_str = process_statement_xml(problem_xml_str)
                 problem_xml_file = open('statements.xml', 'w')
                 problem_xml_file.write(problem_xml_str)

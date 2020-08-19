@@ -9,6 +9,10 @@ IMPORT_ALL_SOLUTIONS = False  # Change it to True if you want to import all solu
 
 RUN_PANDOC = 'pandoc -f latex -t html --mathjax {} -o {}'
 
+CONVERT_EPS = 'gs -dSAFER -dBATCH -dNOPAUSE -dEPSCrop -r600 -sDEVICE=pngalpha -sOutputFile={} {}'
+IMG_STYLE = 'width: auto; max-width: max(50%, 400px); height: auto; max-height: 100%;'
+IMG_SRC_PREFIX = '${getfile}='
+
 SCORING_TEXT = {
     'ru_RU': '<h3>Оценивание</h3>\n{}',
     'en_EN': '<h3>Scoring</h3>\n{}',

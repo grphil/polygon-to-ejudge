@@ -6,6 +6,7 @@ CREATE_STATEMENTS = True  # Change it to False if you do not want to create stat
 
 IMPORT_ALL_SOLUTIONS = False  # Change it to True if you want to import all solutions
 
+# TODO: allow changing above options from script
 
 RUN_PANDOC = 'pandoc -f latex -t html --mathjax {} -o {}'
 

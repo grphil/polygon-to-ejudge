@@ -1,0 +1,1 @@
+from .polygon_to_ejudge import main

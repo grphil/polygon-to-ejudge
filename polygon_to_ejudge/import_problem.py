@@ -34,9 +34,7 @@ def move_file_name(file_name):
 
 
 def extract_images(statements, src_dir, out_dir):
-    print(statements)
     st = BeautifulSoup(statements, "xml")
-    print(st)
     images = st.find_all("img")
     for img in images:
         shutil.copyfile(os.path.join(src_dir, img['src']), os.path.join(out_dir, img['src']))
@@ -53,15 +51,14 @@ def extract_images(statements, src_dir, out_dir):
         img = BeautifulSoup("<img>", features="html.parser")
         img.find('img')['src'] = IMG_SRC_PREFIX + name
         img.find('img')['style'] = IMG_STYLE
-        print(img)
         eps_img.replace_with(img)
-        print(st)
     return str(st)
 
 
 def import_problem(
         ejudge_contest_id: int,
         polygon_id: int,
+        short_name=None,
         ejudge_problem_id=None,
 ) -> None:
     session = problem.ProblemSession(cli_config.polygon_url, polygon_id, None)
@@ -76,13 +73,26 @@ def import_problem(
     old_contest_config = Config(ejudge_contest_id)
 
     if not ejudge_problem_id:
-        ejudge_problem_id = 1
+        max_problem_id = 0
+        short_names = []
         for cfg_problem in contest_config.problems:
-            if "id" not in cfg_problem:
-                continue
-            ejudge_problem_id = max(ejudge_problem_id, cfg_problem["id"] + 1)
+            if "id" in cfg_problem:
+                max_problem_id = max(max_problem_id, int(cfg_problem["id"]))
+            if "short_name" in cfg_problem:
+                short_names.append(cfg_problem["short_name"])
 
-    ejudge_problem_id = int(ejudge_problem_id)
+        if short_name in short_names or short_name is None:
+            short_name = None
+            for i in range(ord('A'), ord('Z') + 1):
+                if chr(i) not in short_names:
+                    short_name = chr(i)
+                    break
+            if short_name is None:
+                i = 0
+                while short_name is None:
+                    if str(i) not in short_names:
+                        short_name = str(i)
+        ejudge_problem_id = max_problem_id + 1
 
     if not os.path.exists(download_dir):
         os.mkdir(download_dir)
@@ -229,7 +239,7 @@ def import_problem(
         problem_config = OrderedDict()
 
         config['id'] = ejudge_problem_id
-        config['short_name'] = chr(ord('A') + ejudge_problem_id - 1)
+        config['short_name'] = short_name
         config['long_name'] = russian_name
         problem_config['long_name_en'] = english_name
         config['internal_name'] = problem_name
@@ -324,7 +334,7 @@ def import_contest(
     problem_keys = list(problems.keys())
     problem_keys.sort()
     for key in problem_keys:
-        import_problem(ejudge_id, problems[key]['id'])
+        import_problem(ejudge_id, problems[key]['id'], key)
 
 
 def add_subparsers(subparsers):
@@ -334,9 +344,10 @@ def add_subparsers(subparsers):
     )
     parser_import_problem.add_argument('contest_id', help='Id of ejudge contest to add problem', type=int)
     parser_import_problem.add_argument('problem_id', help='Polygon id for the problem', type=int)
+    parser_import_problem.add_argument('-short', help="Short name for the problem", default=None, type=str)
     parser_import_problem.add_argument('-ej_id', help="Ejudge id for the problem", default=None, type=int)
     parser_import_problem.set_defaults(
-        func=lambda options: import_problem(options.contest_id, options.problem_id,  options.ej_id)
+        func=lambda options: import_problem(options.contest_id, options.problem_id, options.short, options.ej_id)
     )
 
     parser_import_contest = subparsers.add_parser(

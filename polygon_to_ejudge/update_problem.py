@@ -15,17 +15,21 @@ def update_problem(
 
     polygon_id = None
 
+    short_name = None
+
     for problem in config.problems:
         if 'id' in problem and problem["id"] == ejudge_problem_id:
             if "extid" in problem:
                 polygon_id = problem["extid"]
                 polygon_id = int(polygon_id[polygon_id.find(":") + 1:])
+                if short_name in problem:
+                    short_name = problem["short_name"]
 
     if not polygon_id:
         raise Exception("No polygon id found, can not update")
 
     remove_problem(ejudge_contest_id, ejudge_problem_id, keep_config=True)
-    import_problem(ejudge_contest_id, polygon_id, ejudge_problem_id)
+    import_problem(ejudge_contest_id, polygon_id, short_name, ejudge_problem_id)
 
 
 def update_contest(

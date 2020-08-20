@@ -22,7 +22,7 @@ def update_problem(
             if "extid" in problem:
                 polygon_id = problem["extid"]
                 polygon_id = int(polygon_id[polygon_id.find(":") + 1:])
-                if short_name in problem:
+                if "short_name" in problem:
                     short_name = problem["short_name"]
 
     if not polygon_id:

@@ -165,7 +165,7 @@ def import_problem(
                             os.path.join(problem_dir, 'statement-sections', 'russian'),
                             'ru_RU',
                         )
-                        format_statements.extend(import_statement_res[2:])
+                        format_statements = import_statement_res[2:] + format_statements
                         informatics_statements = import_statement_res[1]
                         statement_xml = import_statement_res[0]
                     if language == 'english':
@@ -173,7 +173,7 @@ def import_problem(
                             os.path.join(problem_dir, 'statement-sections', 'english'),
                             'en_EN',
                         )
-                        format_statements.extend(import_statement_res[2:])
+                        format_statements = import_statement_res[2:] + format_statements
                         if informatics_statements is None:
                             informatics_statements = import_statement_res[1]
                         statement_xml = import_statement_res[0]

@@ -281,16 +281,6 @@ def import_problem(
 
         config['enable_testlib_mode'] = True
 
-        try:
-            problem_description = open('documents/description.txt', 'r')
-            for line in problem_description.readlines():
-                if line.startswith('source_header'):
-                    config['source_header'] = os.path.join(problem_dir, line.split()[1])
-                if line.startswith('source_footer'):
-                    config['source_footer'] = os.path.join(problem_dir, line.split()[1])
-        except:
-            pass
-
         problem_test = tree.find('judging').find('testset').find('tests').find('test')
         if problem_test is not None:
             valuer_config = generate_valuer(tree, 'points' in problem_test.keys())
@@ -298,6 +288,18 @@ def import_problem(
                 config.update(valuer_config)
                 contest_config.common['separate_user_score'] = 1
                 shutil.copy(GVALUER_LOCATION, os.path.join(problems_dir, 'gvaluer'))
+
+        try:
+            problem_description = open('documents/description.txt', 'r')
+            for line in problem_description.readlines():
+                if line.startswith('source_header'):
+                    config['source_header'] = os.path.join(problem_dir, line.split()[1])
+                if line.startswith('source_footer'):
+                    config['source_footer'] = os.path.join(problem_dir, line.split()[1])
+                if line.startswith('ejudge_config'):
+                    config[line.split()[1]] = UnquotedStr(line.split()[2])
+        except:
+            pass
 
         problem_exists = False
         for problem_cfg in contest_config.problems:

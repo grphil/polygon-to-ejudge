@@ -298,6 +298,8 @@ def import_problem(
                     config['source_footer'] = os.path.join(problem_dir, line.split()[1])
                 if line.startswith('ejudge_config'):
                     config[line.split()[1]] = UnquotedStr(line.split()[2])
+                if line.startswith('ejudge_remove_config'):
+                    config.pop(line.split()[1])
         except:
             pass
 

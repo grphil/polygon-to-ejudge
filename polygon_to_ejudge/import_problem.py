@@ -269,7 +269,7 @@ def import_problem(
             config['time_limit'] = time_limit // 1000
         else:
             config['time_limit_millis'] = time_limit
-        config['real_time_limit'] = (time_limit * 2 + 999) // 1000
+        config['real_time_limit'] = max(5, (time_limit * 2 + 999) // 1000)
 
         config['max_vm_size'] = UnquotedStr(memory_limit)
         config['max_stack_size'] = UnquotedStr(memory_limit)

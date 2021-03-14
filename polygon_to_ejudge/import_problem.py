@@ -60,6 +60,7 @@ def import_problem(
         polygon_id: int,
         short_name=None,
         ejudge_problem_id=None,
+        no_offline=False
 ) -> None:
     session = problem.ProblemSession(cli_config.polygon_url, polygon_id, None)
     contest_dir = get_ejudge_contest_dir(ejudge_contest_id)
@@ -283,7 +284,7 @@ def import_problem(
 
         problem_test = tree.find('judging').find('testset').find('tests').find('test')
         if problem_test is not None:
-            valuer_config = generate_valuer(tree, 'points' in problem_test.keys())
+            valuer_config = generate_valuer(tree, 'points' in problem_test.keys(), no_offline)
             if contest_config.common['score_system'].val != 'acm':
                 config.update(valuer_config)
                 contest_config.common['separate_user_score'] = 1
@@ -332,13 +333,14 @@ def import_problem(
 def import_contest(
         ejudge_id: int,
         polygon_id: int,
+        no_offline=False
 ) -> None:
     session = problem.ProblemSession(cli_config.polygon_url, None, None)
     problems = session.send_api_request('contest.problems', {'contestId': polygon_id}, problem_data=False)
     problem_keys = list(problems.keys())
     problem_keys.sort()
     for key in problem_keys:
-        import_problem(ejudge_id, problems[key]['id'], key)
+        import_problem(ejudge_id, problems[key]['id'], key, no_offline=no_offline)
 
 
 def add_subparsers(subparsers):
@@ -350,8 +352,9 @@ def add_subparsers(subparsers):
     parser_import_problem.add_argument('problem_id', help='Polygon id for the problem', type=int)
     parser_import_problem.add_argument('-short', help="Short name for the problem", default=None, type=str)
     parser_import_problem.add_argument('-ej_id', help="Ejudge id for the problem", default=None, type=int)
+    parser_import_problem.add_argument('-n', "--no-offline", help="Ignore offline groups in valuer", action="store_true")
     parser_import_problem.set_defaults(
-        func=lambda options: import_problem(options.contest_id, options.problem_id, options.short, options.ej_id)
+        func=lambda options: import_problem(options.contest_id, options.problem_id, options.short, options.ej_id, options.no_offline)
     )
 
     parser_import_contest = subparsers.add_parser(
@@ -360,6 +363,7 @@ def add_subparsers(subparsers):
     )
     parser_import_contest.add_argument('ejudge_id', help='Ejudge contest id', type=int)
     parser_import_contest.add_argument('polygon_id', help='Polygon contest id', type=int)
+    parser_import_contest.add_argument("-n", "--no-offline", help="Ignore offline groups in valuer", action="store_true")
     parser_import_contest.set_defaults(
-        func=lambda options: import_contest(options.ejudge_id, options.polygon_id)
+        func=lambda options: import_contest(options.ejudge_id, options.polygon_id, options.no_offline)
     )

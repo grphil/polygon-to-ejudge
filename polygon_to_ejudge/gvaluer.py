@@ -22,7 +22,7 @@ def get_group_desc(group_id, l, r, score, requires, test_score, sets_marked, off
     return '\n'.join(res)
 
 
-def generate_valuer(tree: ET.ElementTree, has_groups=True) -> OrderedDict:
+def generate_valuer(tree: ET.ElementTree, has_groups=True, no_offline=False) -> OrderedDict:
     test_points = []
     test_group = []
 
@@ -59,6 +59,8 @@ def generate_valuer(tree: ET.ElementTree, has_groups=True) -> OrderedDict:
             dependencies = group.find('dependencies')
             points_policy = group.attrib['points-policy']
             feedback_policy = group.attrib['feedback-policy']
+            if feedback_policy == 'none' and no_offline:
+                feedback_policy = 'icpc'
 
             if dependencies is not None:
                 for dep in dependencies:

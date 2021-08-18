@@ -135,7 +135,7 @@ def import_problem(
             solution_name = move_file_name(solution_name)
 
             if not IMPORT_ALL_SOLUTIONS:
-                shutil.rmtree(os.path.join(problem_dir, 'solutions/'))
+                shutil.move(os.path.join(problem_dir, 'solutions/'), os.path.join(problem_dir, 'solutions1/'))
 
             if tree.find('documents'):
                 extract_zip(zip_file, 'documents/')

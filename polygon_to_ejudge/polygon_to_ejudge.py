@@ -6,6 +6,7 @@ from sys import argv
 from . import import_problem
 from . import remove_problem
 from . import update_problem
+from . import submit_problem
 from . import login
 
 parser = argparse.ArgumentParser()
@@ -21,6 +22,7 @@ subparsers.required = True
 import_problem.add_subparsers(subparsers)
 remove_problem.add_subparsers(subparsers)
 update_problem.add_subparsers(subparsers)
+submit_problem.add_subparsers(subparsers)
 login.add_subparsers(subparsers)
 
 

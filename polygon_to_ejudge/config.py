@@ -2,11 +2,17 @@ JUDGES_DIR = '/home/judges/'  # Path to judges folder
 
 GVALUER_LOCATION = '/home/judges/001501/problems/gvaluer'  # Path to compiled gvaluer
 
+EJUDGE_URL = 'http://ejudge.algocode.ru/'
+
 CREATE_STATEMENTS = True  # Change it to False if you do not want to create statements for problems
 
 IMPORT_ALL_SOLUTIONS = False  # Change it to True if you want to import all solutions
 
 # TODO: allow changing above options from script
+
+PYTHON_LANG_IDS = [23, 64] # python3 and pypy3
+CPP_LANG_IDS = [3, 52] # g++ and clang
+SOLUTION_FOLDER_NAMES = ['solutions', 'solutions1']
 
 RUN_PANDOC = 'pandoc -f latex -t html --mathjax {} -o {}'
 

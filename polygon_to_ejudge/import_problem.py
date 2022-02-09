@@ -62,6 +62,7 @@ def import_problem(
         ejudge_problem_id=None,
         no_offline=False
 ) -> None:
+    cli_config.setup_login_by_url('')
     session = problem.ProblemSession(cli_config.polygon_url, polygon_id, None)
     contest_dir = get_ejudge_contest_dir(ejudge_contest_id)
     download_dir = os.path.join(contest_dir, 'download')
@@ -335,6 +336,7 @@ def import_contest(
         polygon_id: int,
         no_offline=False
 ) -> None:
+    cli_config.setup_login_by_url('')
     session = problem.ProblemSession(cli_config.polygon_url, None, None)
     problems = session.send_api_request('contest.problems', {'contestId': polygon_id}, problem_data=False)
     problem_keys = list(problems.keys())

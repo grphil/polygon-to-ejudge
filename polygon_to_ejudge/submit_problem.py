@@ -77,7 +77,7 @@ def add_subparsers(subparsers):
         'sc',
         help="Submit solutions for all problems in contest"
     )
-    parser_submit_contest.add_argument('contest_id', help='Id of contest in ejudge to remove', type=int)
+    parser_submit_contest.add_argument('contest_id', help='Id of contest in ejudge to submit solutions', type=int)
     parser_submit_contest.add_argument('-m', "--only-main", help="Submit only main correct solution", action="store_true")
     parser_submit_contest.set_defaults(
         func=lambda options: submit_contest(options.contest_id, options.only_main)

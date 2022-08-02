@@ -82,7 +82,7 @@ def add_subparsers(subparsers):
     )
     parser_submit_contest.add_argument('contest_id', help='Id of contest in ejudge to submit solutions', type=int)
     parser_submit_contest.add_argument('-m', "--only-main", help="Submit only main correct solution", action="store_true")
-    parser_submit_problem.add_argument('-n', "--no-lint", help="Modify solutions to be ignored by linter", action="store_true")
+    parser_submit_contest.add_argument('-n', "--no-lint", help="Modify solutions to be ignored by linter", action="store_true")
     parser_submit_contest.set_defaults(
         func=lambda options: submit_contest(options.contest_id, options.only_main, options.no_lint)
     )

@@ -67,6 +67,7 @@ class EjudgeAuthSession:
             self,
             solution_path: str,
             problem_id: int,
+            no_lint=False,
     ):
         try:
             with open(solution_path) as fp:
@@ -83,6 +84,9 @@ class EjudgeAuthSession:
             is_cpp = False
         else:
             return
+
+        if no_lint and is_cpp:
+            data = '\n'.join([i + "  // NOLINT" for i in data.split('\n')])
 
         data = ' ' + os.path.basename(solution_path) + '\n' + data
         if is_cpp:

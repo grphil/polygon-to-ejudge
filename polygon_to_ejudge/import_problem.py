@@ -241,6 +241,11 @@ def import_problem(
         problem_config = OrderedDict()
 
         config['id'] = ejudge_problem_id
+
+        for prob_conf in contest_config.problems:
+            if 'abstract' in prob_conf and 'short_name' in prob_conf and prob_conf['short_name'] == "Generic":
+                config["super"] = "Generic"
+
         config['short_name'] = short_name
         config['long_name'] = russian_name
         problem_config['long_name_en'] = english_name

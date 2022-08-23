@@ -30,15 +30,6 @@ def import_statement(location: str, language: str):
     examples = ET.SubElement(tree, 'examples')
     current_example = None
 
-    for statement_file in statement_files:
-        if statement_file.startswith('example'):
-            content = open(os.path.join(location, statement_file), 'r').read()
-            if statement_file.endswith('.a'):
-                ET.SubElement(current_example, 'output').text = content
-            else:
-                current_example = ET.SubElement(examples, 'example')
-                ET.SubElement(current_example, 'input').text = content
-
     legend = ''
     informatics_statement = ''
     res = [tree, informatics_statement]
@@ -81,6 +72,19 @@ def import_statement(location: str, language: str):
     if len(notes) > 0:
         res.append(notes)
         ET.SubElement(statement, 'notes').text = '{}'
+
+    current_example = None
+
+    for statement_file in statement_files:
+        if statement_file.startswith('example'):
+            content = open(os.path.join(location, statement_file), 'r').read()
+            res.append(content)
+
+            if statement_file.endswith('.a'):
+                ET.SubElement(current_example, 'output').text = '{}'
+            else:
+                current_example = ET.SubElement(examples, 'example')
+                ET.SubElement(current_example, 'input').text = '{}'
 
     informatics_statement = INFORMATICS.format(informatics_statement)
     res[1] = informatics_statement

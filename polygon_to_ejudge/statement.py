@@ -18,6 +18,7 @@ def latex_to_html(location: str, file_name: str) -> str:
     ))
     result = open(os.path.join(location, "out.html")).read()
     result = result.replace('[0cm]', '')
+    result = result.replace('<table>', '<table class="statements">')
     return result
 
 

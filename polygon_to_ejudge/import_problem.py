@@ -63,7 +63,7 @@ def import_problem(
         no_offline=False
 ) -> None:
     cli_config.setup_login_by_url('')
-    session = problem.ProblemSession(cli_config.polygon_url, polygon_id, None)
+    session = problem.ProblemSession("main", polygon_id, None)
     contest_dir = get_ejudge_contest_dir(ejudge_contest_id)
     download_dir = os.path.join(contest_dir, 'download')
     tmp_dir = os.path.join(contest_dir, 'tmp')
@@ -159,6 +159,7 @@ def import_problem(
                 problem_xml = ET.Element('problem')
 
                 format_statements = []
+                format_examples = []
                 informatics_statements = None
                 for language in statement_languages:
                     statement_xml = None
@@ -167,7 +168,8 @@ def import_problem(
                             os.path.join(problem_dir, 'statement-sections', 'russian'),
                             'ru_RU',
                         )
-                        format_statements = import_statement_res[2:] + format_statements
+                        format_statements = import_statement_res[2] + format_statements
+                        format_examples = import_statement_res[3]
                         informatics_statements = import_statement_res[1]
                         statement_xml = import_statement_res[0]
                     if language == 'english':
@@ -175,7 +177,8 @@ def import_problem(
                             os.path.join(problem_dir, 'statement-sections', 'english'),
                             'en_EN',
                         )
-                        format_statements = import_statement_res[2:] + format_statements
+                        format_statements = import_statement_res[2] + format_statements
+                        format_examples = import_statement_res[3]
                         if informatics_statements is None:
                             informatics_statements = import_statement_res[1]
                         statement_xml = import_statement_res[0]
@@ -184,6 +187,7 @@ def import_problem(
                         if not example:
                             problem_xml.insert(0, statement_xml.find('examples'))
                         problem_xml.insert(0, statement_xml.find('statement'))
+                format_statements.extend(format_examples)
                 if informatics_statements is not None:
                     informatics_statements_file = open("statements.html", "w")
                     informatics_statements_file.write(informatics_statements)

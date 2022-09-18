@@ -33,6 +33,8 @@ def import_statement(location: str, language: str):
     legend = ''
     informatics_statement = ''
     res = [tree, informatics_statement]
+    format_statement = []
+    format_example = []
     if 'legend.tex' in statement_files:
         text = latex_to_html(location, 'legend.tex')
         legend += text
@@ -41,13 +43,13 @@ def import_statement(location: str, language: str):
     if 'input.tex' in statement_files:
         ET.SubElement(statement, 'input_format').text = '{}'
         text = latex_to_html(location, 'input.tex')
-        res.append(text)
+        format_statement.append(text)
         informatics_statement += INFORMATICS_INPUT.format(text)
 
     if 'output.tex' in statement_files:
         ET.SubElement(statement, 'output_format').text = '{}'
         text = latex_to_html(location, 'output.tex')
-        res.append(text)
+        format_statement.append(text)
         informatics_statement += INFORMATICS_OUTPUT.format(text)
 
     if 'interaction.tex' in statement_files:
@@ -56,7 +58,7 @@ def import_statement(location: str, language: str):
         informatics_statement += INFORMATICS_INTERACTION.format(text)
 
     if len(legend) > 0:
-        res.append(legend)
+        format_statement.append(legend)
         ET.SubElement(statement, 'description').text = '{}'
 
     notes = ''
@@ -70,7 +72,7 @@ def import_statement(location: str, language: str):
         notes += SCORING_TEXT[language].format(text)
         informatics_statement += INFORMATICS_SCORING.format(text)
     if len(notes) > 0:
-        res.append(notes)
+        format_statement.append(notes)
         ET.SubElement(statement, 'notes').text = '{}'
 
     current_example = None
@@ -78,7 +80,7 @@ def import_statement(location: str, language: str):
     for statement_file in statement_files:
         if statement_file.startswith('example'):
             content = open(os.path.join(location, statement_file), 'r').read()
-            res.append(content)
+            format_example.append(content)
 
             if statement_file.endswith('.a'):
                 ET.SubElement(current_example, 'output').text = '{}'
@@ -88,6 +90,8 @@ def import_statement(location: str, language: str):
 
     informatics_statement = INFORMATICS.format(informatics_statement)
     res[1] = informatics_statement
+    res.append(format_statement)
+    res.append(format_example)
     return res
 
 

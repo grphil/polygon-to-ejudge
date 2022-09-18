@@ -86,7 +86,12 @@ class EjudgeAuthSession:
             return
 
         if no_lint and is_cpp:
-            data = '\n'.join([i + "  // NOLINT" for i in data.split('\n')])
+            data_no_lint = []
+            for line in data.split('\n'):
+                if line.find('*/') == -1:
+                    line += "  // NOLINT"
+                data_no_lint.append(line)
+            data = '\n'.join(data_no_lint)
 
         data = ' ' + os.path.basename(solution_path) + '\n' + data
         if is_cpp:

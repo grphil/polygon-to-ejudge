@@ -11,7 +11,7 @@ from polygon_cli import config as cli_config
 
 from .common import Config, get_ejudge_contest_dir, UnquotedStr
 from .config import PROBLEM_CFG_START, GVALUER_LOCATION, CREATE_STATEMENTS, IMPORT_ALL_SOLUTIONS, CONVERT_EPS, \
-    IMG_STYLE, IMG_SRC_PREFIX
+    IMG_STYLE, IMG_SRC_PREFIX, TEXTAREA_INPUT
 from .gvaluer import generate_valuer
 from .statement import import_statement, process_statement_xml
 
@@ -291,6 +291,9 @@ def import_problem(
         config['solution_cmd'] = solution_name
 
         config['enable_testlib_mode'] = True
+
+        if TEXTAREA_INPUT:
+            config['enable_text_form'] = True
 
         problem_test = tree.find('judging').find('testset').find('tests').find('test')
         if problem_test is not None:

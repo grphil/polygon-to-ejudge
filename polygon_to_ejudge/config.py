@@ -8,6 +8,8 @@ CREATE_STATEMENTS = True  # Change it to False if you do not want to create stat
 
 IMPORT_ALL_SOLUTIONS = False  # Change it to True if you want to import all solutions
 
+TEXTAREA_INPUT = True
+
 # TODO: allow changing above options from script
 
 PYTHON_LANG_IDS = [23, 64] # python3 and pypy3

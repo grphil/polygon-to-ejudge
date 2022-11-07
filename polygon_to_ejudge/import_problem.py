@@ -37,7 +37,10 @@ def extract_images(statements, src_dir, out_dir):
     st = BeautifulSoup(statements, "xml")
     images = st.find_all("img")
     for img in images:
-        shutil.copyfile(os.path.join(src_dir, img['src']), os.path.join(out_dir, img['src']))
+        try:
+            shutil.copyfile(os.path.join(src_dir, img['src']), os.path.join(out_dir, img['src']))
+        except Exception as e:
+            print(e)
         img['src'] = IMG_SRC_PREFIX + img['src']
         img['style'] = IMG_STYLE
 

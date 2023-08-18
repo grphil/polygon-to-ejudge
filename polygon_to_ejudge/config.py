@@ -2,7 +2,7 @@ JUDGES_DIR = '/home/judges/'  # Path to judges folder
 
 GVALUER_LOCATION = '/home/judges/001501/problems/gvaluer'  # Path to compiled gvaluer
 
-EJUDGE_URL = 'http://ejudge.algocode.ru/'
+EJUDGE_URL = 'https://ejudge.algocode.ru/'
 
 CREATE_STATEMENTS = True  # Change it to False if you do not want to create statements for problems
 
@@ -12,8 +12,15 @@ TEXTAREA_INPUT = True
 
 # TODO: allow changing above options from script
 
-PYTHON_LANG_IDS = [23, 64] # python3 and pypy3
-CPP_LANG_IDS = [3, 52] # g++ and clang
+LANG_IDS = {
+    "py": [23, 64],  # python3 and pypy3
+    "cpp": [3, 52],  # g++ and clang
+    "java": [18],  # java
+    "pas": [1],  # Free Pascal
+}
+
+PYTHON_LANG_IDS = [23, 64]
+CPP_LANG_IDS = [3, 52]
 SOLUTION_FOLDER_NAMES = ['solutions', 'solutions1']
 
 RUN_PANDOC = 'pandoc -f latex -t html --mathjax {} -o {}'

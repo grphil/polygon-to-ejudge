@@ -5,10 +5,9 @@ import polygon_cli.config
 import requests
 import yaml
 
-from .config import EJUDGE_URL, CPP_LANG_IDS, PYTHON_LANG_IDS
+from .config import EJUDGE_URL, LANG_IDS
 
 ejudge_auth_file = os.path.join(os.path.expanduser('~'), '.config', 'polygon-to-ejudge', 'auth.yaml')
-
 
 class EjudgeAuthSession:
     def __init__(self, contest_id: int):
@@ -79,13 +78,17 @@ class EjudgeAuthSession:
             return
 
         if solution_path.endswith(".cpp"):
-            is_cpp = True
+            lang_type = "cpp"
         elif solution_path.endswith(".py"):
-            is_cpp = False
+            lang_type = "py"
+        elif solution_path.endswith(".java"):
+            lang_type = "java"
+        elif solution_path.endswith("pas") or solution_path.endswith("fpc") or solution_path.endswith("dpr"):
+            lang_type = "pas"
         else:
             return
 
-        if no_lint and is_cpp:
+        if no_lint and lang_type == "cpp":
             data_no_lint = []
             for line in data.split('\n'):
                 if line.find('*/') == -1:
@@ -93,13 +96,12 @@ class EjudgeAuthSession:
                 data_no_lint.append(line)
             data = '\n'.join(data_no_lint)
 
-        data = ' ' + os.path.basename(solution_path) + '\n' + data
-        if is_cpp:
-            data = '//' + data
-        else:
-            data = '#' + data
+        if lang_type == "cpp" or lang_type == "java":
+            data = '//' + os.path.basename(solution_path) + '\n' + data
+        elif lang_type == "py":
+            data = '#' + os.path.basename(solution_path) + '\n' + data
 
-        lang_ids = CPP_LANG_IDS if is_cpp else PYTHON_LANG_IDS
+        lang_ids = LANG_IDS[lang_type]
         for lang_id in lang_ids:
             self.submit_data(data, lang_id, problem_id)
 

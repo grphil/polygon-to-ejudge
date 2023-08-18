@@ -28,7 +28,10 @@ def move_file_name(file_name):
     if '/' in file_name:
         prefix = file_name[:file_name.rfind('/')]
         file_name = file_name[file_name.rfind('/') + 1:]
-    shutil.copyfile(os.path.join(prefix, file_name), file_name)
+    output_file_name = file_name
+    if output_file_name.endswith("dpr"):
+        output_file_name = output_file_name[:-3] + "pas"
+    shutil.copyfile(os.path.join(prefix, file_name), output_file_name)
     file_name = file_name[:file_name.rfind('.')]
     return file_name
 

@@ -10,6 +10,8 @@ IMPORT_ALL_SOLUTIONS = False  # Change it to True if you want to import all solu
 
 TEXTAREA_INPUT = True
 
+NOLINT_STRING = "secret"
+
 # TODO: allow changing above options from script
 
 LANG_IDS = {

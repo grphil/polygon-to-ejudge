@@ -5,7 +5,7 @@ import polygon_cli.config
 import requests
 import yaml
 
-from .config import EJUDGE_URL, LANG_IDS
+from .config import EJUDGE_URL, LANG_IDS, NOLINT_STRING
 
 ejudge_auth_file = os.path.join(os.path.expanduser('~'), '.config', 'polygon-to-ejudge', 'auth.yaml')
 
@@ -89,12 +89,7 @@ class EjudgeAuthSession:
             return
 
         if no_lint and lang_type == "cpp":
-            data_no_lint = []
-            for line in data.split('\n'):
-                if line.find('*/') == -1:
-                    line += "  // NOLINT"
-                data_no_lint.append(line)
-            data = '\n'.join(data_no_lint)
+            data = '// ' + NOLINT_STRING + '\n' + data
 
         if lang_type == "cpp" or lang_type == "java":
             data = '//' + os.path.basename(solution_path) + '\n' + data

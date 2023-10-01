@@ -79,7 +79,7 @@ def import_statement(location: str, language: str):
     current_example = None
 
     for statement_file in statement_files:
-        if statement_file.startswith('example'):
+        if statement_file.startswith('example.') and statement_file[8:9].isnumeric():
             content = open(os.path.join(location, statement_file), 'r').read()
             format_example.append(content)
 
